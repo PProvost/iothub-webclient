@@ -39,25 +39,25 @@
                 </thead>
                 <tr>
                     <td>
-                        <label for="angleSlider">Device Angle (angle)</label>
+                        <label for="occupancySlider">Occupancy Count</label>
                     </td>
                     <td>
-                        <input id="angleSlider" v-model="telemetry.angle" type="range" min="-180" max="180" step="1" /> 
+                        <input id="occupancySlider" v-model="telemetry.occupancyCount" type="range" min="0" max="30" step="1" /> 
                     </td>
                     <td>
-                        <span>{{telemetry.angle}}</span>
+                        <span>{{telemetry.occupancyCount}}</span>
                     </td>
                 </tr>
 
                 <tr>
                     <td>
-                        <label for="motionCheckbox">Motion Detected (pir)</label>
+                        <label for="motionCheckbox">Motion Detected (motion)</label>
                     </td>
                     <td style="text-align:center">
                         <input id="motionCheckbox" v-model="isMotionDetected" type="checkbox" @click="updateMotion()" /> 
                     </td>
                     <td>
-                        <span>{{telemetry.pir}}</span>
+                        <span>{{telemetry.rawInputs.motion}}</span>
                     </td>
                 </tr>   
 
@@ -66,34 +66,22 @@
                         <label for="tempSlider">Temperature (Temperature)</label>
                     </td>
                     <td>
-                        <input id="tempSlider" v-model="telemetry.Temperature" type="range" min="-20" max="50" step="0.5" /> 
+                        <input id="tempSlider" v-model="telemetry.rawInputs.temperature" type="range" min="-20" max="50" step="0.5" /> 
                     </td>
                     <td>
-                        <span>{{telemetry.Temperature}}</span>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <label for="pressureSlider">Pressure (Pressure)</label>
-                    </td>
-                    <td>
-                        <input id="pressureSlider" v-model="telemetry.Pressure" type="range" min="0" max="20000" step="500" /> 
-                    </td>
-                    <td>
-                        <span>{{telemetry.Pressure}}</span>
+                        <span>{{telemetry.rawInputs.temperature}}</span>
                     </td>
                 </tr>
 
                 <tr>
                     <td>
-                        <label for="humidSlider">Humidity (Humidity)</label>
+                        <label for="soundLevelSlider">Sound Level (soundLevel)</label>
                     </td>
                     <td>
-                        <input id="humidSlider" v-model="telemetry.Humidity" type="range" min="0" max="100" step="1" /> 
+                        <input id="soundLevelSlider" v-model="telemetry.rawInputs.soundLevel" type="range" min="0" max="120" step="1" /> 
                     </td>
                     <td>
-                        <span>{{telemetry.Humidity}}</span>
+                        <span>{{telemetry.rawInputs.soundLevel}}</span>
                     </td>
                 </tr>
 
@@ -104,7 +92,7 @@
                     <td style="text-align:center">
                         <button @click="startTelemetry()" v-show="!isTelemetryRunning">Start</button>
                         <button @click="stopTelemetry()" v-show="isTelemetryRunning">Stop</button>
-                            </td>
+                    </td>
                     <td>{{ sentMessages }} msgs sent</td>
                 </tr>
             </table>

@@ -39,7 +39,7 @@ const createApp = () => {
         "occupancyCount": 0,
         "rawInputs": {
           "temperature": 0.0,
-          "motion": true,
+          "motion": false,
           "soundLevel": 20
         }
       }
@@ -175,7 +175,7 @@ const createApp = () => {
         this.sentMessages = 0
       },
       updateMotion () {
-        this.telemetry.pir = this.isMotionDetected.toString()
+        this.telemetry.rawInputs.motion = (!this.isMotionDetected).toString()
       },
       async ackDesired (dc, status) {
         const dco = JSON.parse(dc)
