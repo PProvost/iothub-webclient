@@ -51,7 +51,7 @@ const createApp = () => {
     },
     async created () {
       /** @type { ConnectionInfo } connInfo */
-      const connInfo = JSON.parse(window.localStorage.getItem('connectionInfo') || '{}')
+      const connInfo = {} // JSON.parse(window.localStorage.getItem('connectionInfo') || '{}')
 
       connInfo.deviceId = connInfo.deviceId || 'device' + Date.now()
 
