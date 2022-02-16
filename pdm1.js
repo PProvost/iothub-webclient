@@ -85,7 +85,7 @@ const createApp = () => {
         } else {
           this.connectionInfo.hubName = result.status
         }
-        console.log("3" + this.connectionInfo.hubName)
+        console.log("DPS hub name: " + this.connectionInfo.hubName)
         this.viewDpsForm = false
       },
       async refreshDeviceId() {
