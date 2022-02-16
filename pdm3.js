@@ -175,7 +175,7 @@ const createApp = () => {
         this.sentMessages = 0
       },
       updateMotion () {
-        this.telemetry.rawInputs.motion = (!this.isMotionDetected).toString()
+        this.telemetry.rawInputs.motion = !this.isMotionDetected
       },
       async ackDesired (dc, status) {
         const dco = JSON.parse(dc)
