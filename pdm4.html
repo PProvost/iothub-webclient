@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDM-2: Azure IoT Hackathon</title>
+    <!-- This is a development version of Vue.js! -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="lib/paho-mqtt.js"></script>
+    <link rel="stylesheet" href="s.css">
+</head>
+
+<body>
+    <div id="app">
+        <h1>Hackathon Physical Device 2 - M5Go</h1>
+
+        <h3>motion_sensor_2 (dtmi:M5Stack:m5go;1)</h3>
+
+        <div>
+            <img style="float:left" src="media/m5go_01.webp" width="250"/>
+        </div>
+        <div>
+            <label for="spanConnectionStatus">Connection Status</label>
+            <span id="spanConnectionStatus">{{connectionInfo.status}}</span>
+            <input v-show="!connectionInfo.connected" type="button" id="btnConnect" value="Connect" @click="connect()">
+            <span v-show="connectionInfo.connected">Close this window to disconnect</span>
+        </div>
+        <!-- Device controls DIV -->
+        <div v-show="connectionInfo.connected">
+            <h4>Telemetry Controls</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Value</th>
+                        <th>Control</th>
+                        <th>Current Value</th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>
+                        <label for="angleSlider">Device Angle (angle)</label>
+                    </td>
+                    <td>
+                        <input id="angleSlider" v-model="telemetry.angle" type="range" min="-180" max="180" step="1" /> 
+                    </td>
+                    <td>
+                        <span>{{telemetry.angle}}</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label for="motionCheckbox">Motion Detected (pir)</label>
+                    </td>
+                    <td style="text-align:center">
+                        <input id="motionCheckbox" v-model="isMotionDetected" type="checkbox" @click="updateMotion()" /> 
+                    </td>
+                    <td>
+                        <span>{{telemetry.pir}}</span>
+                    </td>
+                </tr>   
+
+                <tr>
+                    <td>
+                        <label for="tempSlider">Temperature (Temperature)</label>
+                    </td>
+                    <td>
+                        <input id="tempSlider" v-model="telemetry.Temperature" type="range" min="-20" max="50" step="0.5" /> 
+                    </td>
+                    <td>
+                        <span>{{telemetry.Temperature}}</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label for="pressureSlider">Pressure (Pressure)</label>
+                    </td>
+                    <td>
+                        <input id="pressureSlider" v-model="telemetry.Pressure" type="range" min="0" max="20000" step="500" /> 
+                    </td>
+                    <td>
+                        <span>{{telemetry.Pressure}}</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label for="humidSlider">Humidity (Humidity)</label>
+                    </td>
+                    <td>
+                        <input id="humidSlider" v-model="telemetry.Humidity" type="range" min="0" max="100" step="1" /> 
+                    </td>
+                    <td>
+                        <span>{{telemetry.Humidity}}</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label for="enableTelemBtn">Enable Telemetry</label>
+                    </td>
+                    <td style="text-align:center">
+                        <button @click="startTelemetry()" v-show="!isTelemetryRunning">Start</button>
+                        <button @click="stopTelemetry()" v-show="isTelemetryRunning">Stop</button>
+                            </td>
+                    <td>{{ sentMessages }} msgs sent</td>
+                </tr>
+            </table>
+        </div>
+        <!-- Connection Info DIV -->
+        <div>
+            <h4>Connection Info</h4>
+            <table id="connectionInfoTable" border="1">
+                <tr v-for="(val,field) in connectionInfo">
+                    <td>{{field}}</td>
+                    <td>{{val}}</td>
+                </tr>
+                <tr>
+                    <td>Connection string</td>
+                    <td>{{connectionString}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!--- Rido's Old Stuff Below Here -->
+        <div v-show="false">
+            <h1>Azure IoT Hub Web Client</h1>
+            <h3>
+                <span v-show="!connectionInfo.connected">Credentials</span>
+                <div v-show="!connectionInfo.connected" >
+                    <a v-show="!viewDpsForm" @click="showDpsForm()" href="#">Use DPS/Central</a>
+                    <a v-show="viewDpsForm" @click="showDpsForm()" href="#">Use Hub Connection String</a>
+                <div>
+            </h3>
+            <div v-show="!connectionInfo.connected">
+                <p>
+                    <label for="inputModelId">Model Id</label>
+                    <input type="text" id="inputModelId" size="55" v-model='connectionInfo.modelId'>
+                </p>
+                <p>
+                    <label for="inputDeviceId">DeviceId</label>
+                    <input type="text" id="inputDeviceId" size="55" 
+                            v-model='connectionInfo.deviceId'
+                            @change='updateDeviceKey()'>
+
+                    <a v-show="viewDpsForm" href="#" @click="refreshDeviceId()">refresh</a>
+                </p>
+                <p>
+                    <label for="inputDeviceKey">DeviceKey</label>
+                    <input type="text" id="inputDeviceKey" size="55" 
+                    :disabled='disableDeviceKey'
+                    v-model='connectionInfo.deviceKey'>
+                </p>
+            </div>
+            <div v-show="viewDpsForm">
+                <p>
+                    <label for="input Id Scope">IdScope</label>
+                    <input type="text" id="inputIdScope" size="55" v-model='connectionInfo.scopeId' />
+                </p>
+                <p>
+                    <label for="inputMasterKey">MasterKey</label>
+                    <input type="text" id="inputMasterKey" size="55" 
+                    @change='updateDeviceKey()'
+                    v-model='connectionInfo.masterKey'>
+                </p>
+
+                <div class="right" v-show="!runningProvision">
+                    <input type="button" id="btnDPS" value="Provision" @click="provision()">
+                </div>
+                <div v-show="runningProvision">
+                    <span>Provisioning device ...</span>    
+                </div>
+            </div>
+            <div v-show="!connectionInfo.connected && !viewDpsForm">
+                
+                <p>
+                    <label for="inputHostName">Hub Name</label>
+                    <input type="text" id="inputHostName" size="55" v-model='connectionInfo.hubName' />
+                </p>
+
+                <div class="right">
+                    <label for="chkSaveConfig">Save Config</label>
+                    <input type="checkbox" v-model="saveConfig">
+                    <label for="btnConnect">{{connectionInfo.status}}</label>
+                    <input type="button" id="btnConnect" value="Connect" @click="connect()">
+                </div>
+                <p>
+                <pre>{{ connectionString }}</pre>
+                </p>
+            </div>
+
+            <div v-show="connectionInfo.connected" class="connected">
+                Device <strong>{{ connectionInfo.deviceId }}</strong> connected to IoT Hub
+                <strong>{{ connectionInfo.hubName }}</strong>
+            </div>
+
+            <div v-show="connectionInfo.connected">
+                <table>
+                    <tr>
+                        <td>
+                            <div>
+                                <h4>Reported Properties</h4>
+                                <div>
+                                    <textarea cols="30" rows="5" v-model="reportedPropJson"></textarea>
+                                </div>
+                                <button @click="reportProp()">Report Prop</button>
+                                <button @click="readTwin()">Refresh Twin</button>
+                                <pre>{{ reportedJson | pretty }}</pre>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <h4>Desired Properties</h4>
+                                <h5>Updates
+                                    <a href="#" @click="clearUpdates()">(clear)</a>
+                                </h5>
+                                <ul v-for="dc in desiredCalls">
+                                    <pre>{{ dc | pretty }}</pre>
+                                    <button @click="ackDesired(dc, 200)">ACK OK</button>
+                                    <button @click="ackDesired(dc, 500)">ACK Fail</button>
+                                </ul>
+                                <pre>{{ desiredJson | pretty }}</pre>
+                            </div>
+                        </td>
+                    
+                        <td>
+                            <div>
+                                <h4>Telemetry</h4>
+                                <div>
+                                    <textarea cols="30" rows="3" v-model="telemetryJson"></textarea>
+                                </div>
+                                <button @click="startTelemetry()" v-show="!isTelemetryRunning">Start Telemetry</button>
+                                <button @click="stopTelemetry()" v-show="isTelemetryRunning">Stop Telemetry</button>
+
+                                <span>Messages sent {{ sentMessages }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <h4>
+                                    Commands <a href="#" @click="clearCommands()">(clear)</a>
+                                </h4>
+                                <ul v-for="c in commands">
+                                    <strong>{{ c.method }}</strong> {{ c.rid }}
+                                    <pre>{{ c.payload | pretty }}</pre>
+                                    <div v-if="c.dirty===false">
+                                        <textarea cols="50" rows="3" v-model="c.response"></textarea>
+                                        <button @click="cmdResponse(c, 200)">Response OK</button>
+                                        <button @click="cmdResponse(c, 500)">Failed</button>
+                                    </div>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="pdm2.js" type="module"></script>
+    <div class="footer">
+        <i>
+            Using <a href="https://github.com/eclipse/paho.mqtt.javascript">paho.mqtt.javascript</a> to communicate with
+            Azure IoT hub.
+            <a href="http://github.com/ridomin/iothub-webclient">source 0.0.039</a> by <a href="https://twitter.com/ridomin">ridomin</a>
+
+        </i>
+    </div>
+</body>
+
+</html>
