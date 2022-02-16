@@ -1,0 +1,39 @@
+{
+    "@context": "dtmi:dtdl:context;3",
+    "@id": "dtmi:example:foobar:occupancySensor;1",
+    "@type": "Interface",
+    "description": "infers occupancy count from temperature, motion and sound",
+    "contents": [
+      {
+        "@type": [ "Telemetry", "Occupancy" ],
+        "name": "occupancyCount",
+        "schema": "integer"
+      },
+      {
+        "@type": "Telemetry",
+        "name": "rawInputs",
+        "schema": {
+          "@type": "Object",
+          "fields": [
+            {
+              "@type": [ "Field", "Temperature" ],
+              "name": "temperature",
+              "schema": "double",
+              "unit": "degreeCelsius"
+            },
+            {
+              "@type": [ "Field", "Motion" ],
+              "name": "motion",
+              "schema": "boolean"
+            },
+            {
+              "@type": [ "Field", "SoundPressure" ],
+              "name": "soundLevel",
+              "schema": "integer",
+              "unit": "decibel"
+            }
+          ]
+        }
+      }
+    ]
+  }

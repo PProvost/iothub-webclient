@@ -42,20 +42,4 @@ export class AzDpsClient {
     console.log(resp)
     return resp
   }
-
-  async registerDevice_noModelId () {
-    const endpoint = 'https://dps-proxy.azurewebsites.net/register'
-    const url = `${endpoint}?scopeId=${this.scopeId}&deviceId=${this.deviceId}&deviceKey=${encodeURIComponent(this.deviceKey)}`
-    console.log("**" + url)
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Encoding': 'utf-8'
-      }
-    })
-    const resp = await response.json()
-    console.log("**+" + resp)
-    return resp
-  }
 }

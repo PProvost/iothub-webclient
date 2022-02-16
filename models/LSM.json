@@ -1,0 +1,14 @@
+{
+  "@context": "dtmi:dtdl:context;2",
+  "@id": "dtmi:Fabrikam:motion_sensor;1",
+  "@type": "Interface",
+  "displayName": "Motion Sensor",
+  "contents": [
+    {
+      "@type": [ "Telemetry", "Motion" ],
+      "name": "motionDetected",
+      "displayName": "Motion Detected",
+      "schema": "boolean"
+    }
+  ]
+}
